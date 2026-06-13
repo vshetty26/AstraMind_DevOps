@@ -2,44 +2,39 @@ import { useState, useEffect } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 
 const navItems = [
-  { to: "/", icon: "🛸", label: "Dashboard" },
-  { to: "/missions", icon: "🚀", label: "Missions" },
-  { to: "/telemetry", icon: "📡", label: "Telemetry" },
-  { to: "/alerts", icon: "⚠️", label: "Alerts" },
-  { to: "/analytics", icon: "📊", label: "Analytics" },
+  { to: "/",          icon: "◈", label: "Dashboard"  },
+  { to: "/missions",  icon: "◎", label: "Missions"   },
+  { to: "/telemetry", icon: "◉", label: "Telemetry"  },
+  { to: "/alerts",    icon: "◬", label: "Alerts"     },
+  { to: "/analytics", icon: "◫", label: "Analytics"  },
 ];
 
-function Clock() {
-  const [time, setTime] = useState(new Date());
-  useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
-  return time.toUTCString().slice(17, 25) + " UTC";
+function LiveClock() {
+  const [t, setT] = useState(new Date());
+  useEffect(() => { const i = setInterval(() => setT(new Date()), 1000); return () => clearInterval(i); }, []);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${pad(t.getDate())} ${t.toLocaleString("en",{month:"short"}).toUpperCase()} ${t.getFullYear()} ${pad(t.getHours())}:${pad(t.getMinutes())}:${pad(t.getSeconds())}`;
 }
 
-const pageTitles = {
-  "/": "MISSION CONTROL",
-  "/missions": "MISSIONS",
-  "/telemetry": "TELEMETRY",
-  "/alerts": "ALERTS",
-  "/analytics": "ANALYTICS",
+const PAGE_TITLES = {
+  "/":          { label: "MISSION CONTROL", sub: "DASHBOARD" },
+  "/missions":  { label: "MISSIONS",        sub: "REGISTRY"  },
+  "/telemetry": { label: "TELEMETRY",       sub: "LIVE FEED" },
+  "/alerts":    { label: "ALERTS",          sub: "SYSTEM"    },
+  "/analytics": { label: "ANALYTICS",       sub: "INSIGHTS"  },
 };
 
 export default function Layout() {
-  const location = useLocation();
-  const title = pageTitles[location.pathname] || "ASTRAMIND";
+  const { pathname } = useLocation();
+  const page = PAGE_TITLES[pathname] || { label: "ASTRAMIND", sub: "" };
 
   return (
     <div className="app-layout">
-      {/* Orbit decoration */}
-      <div className="orbit-bg" />
-
-      {/* Sidebar */}
+      {/* ── SIDEBAR ── */}
       <aside className="sidebar">
         <div className="sidebar-logo">
           <h1>ASTRAMIND</h1>
-          <p>Mission Control v1.0</p>
+          <p>Mission Control</p>
         </div>
 
         <nav className="sidebar-nav">
@@ -49,34 +44,38 @@ export default function Layout() {
               key={item.to}
               to={item.to}
               end={item.to === "/"}
-              className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+              className={({ isActive }) => `nav-item${isActive ? " active" : ""}`}
             >
-              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-icon" style={{ fontStyle: "normal" }}>{item.icon}</span>
               {item.label}
             </NavLink>
           ))}
         </nav>
 
         <div className="sidebar-status">
-          <div className="status-indicator">
+          <div className="status-row">
             <div className="status-dot" />
-            System Online
+            <span className="status-label">NOMINAL</span>
           </div>
-          <div style={{ marginTop: 8, fontSize: "0.72rem", color: "var(--text-muted)" }}>
-            Deep Space Network: Active
+          <div style={{ marginTop: 6, fontSize: "0.6rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", letterSpacing: 1 }}>
+            DSN LINK ACTIVE
           </div>
         </div>
       </aside>
 
-      {/* Main */}
+      {/* ── MAIN ── */}
       <div className="main-content">
+        {/* Topbar */}
         <header className="topbar">
-          <span className="topbar-title">{title}</span>
+          <div className="topbar-left">
+            <span className="topbar-status-label">SYSTEM STATUS:</span>
+            <span className="topbar-status-value">NOMINAL</span>
+            <div className="topbar-sep" />
+            <span className="topbar-status-label">{page.sub}</span>
+          </div>
           <div className="topbar-right">
-            <span className="topbar-time">
-              <Clock />
-            </span>
-            <span className="topbar-badge">MISSION CONTROL</span>
+            <span className="topbar-time"><LiveClock /></span>
+            <span className="topbar-badge">MISSION CTRL</span>
           </div>
         </header>
 

@@ -3,12 +3,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/vshetty26/AstraMind_DevOps.git'
-            }
-        }
-
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
@@ -26,7 +20,7 @@ pipeline {
             }
         }
 
-        stage('Docker Check') {
+        stage('Verify Docker') {
             steps {
                 sh 'docker --version'
             }
@@ -39,7 +33,7 @@ pipeline {
         }
 
         failure {
-            echo 'Pipeline Failed!'
+            echo 'AstraMind CI/CD Pipeline Failed!'
         }
     }
 }
